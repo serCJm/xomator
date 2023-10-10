@@ -7,9 +7,11 @@ import { countdownTimer } from "./utils/countdownTimer.js";
 const { CLOSE_BROWSER, MIN_MAX_PROFILE_WAIT_TIME } = config;
 
 export async function runProfile(userId: string) {
+	console.log(`### Running profile: ${userId} ###`);
 	const browserWSEndpoint = await getBrowserWSEndpoint(userId);
 	const browser = await puppeteer.connect({
 		browserWSEndpoint,
+		defaultViewport: null,
 	});
 
 	await runModules(browser);
