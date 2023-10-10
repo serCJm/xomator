@@ -18,7 +18,7 @@ export function parseProfilesRange() {
 				return [r];
 			}
 		})
-		.filter((p) => EXCLUDED_PROFILES.has(p));
+		.filter((p) => !EXCLUDED_PROFILES.has(p));
 
 	return new Set(range);
 }
