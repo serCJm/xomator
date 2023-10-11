@@ -19,6 +19,12 @@ export class XPup {
 		await setTimeout(1000);
 	}
 
+	async clickBySelector(sel: string, delay?: number) {
+		await this.#page.waitForSelector(sel, { timeout: delay });
+		await this.#page.click(sel);
+		await setTimeout(1000);
+	}
+
 	async clickByText(
 		text: string,
 		type: string = "*",
@@ -40,16 +46,10 @@ export class XPup {
 		await (shadowElement as ElementHandle<Element>).click();
 	}
 
-	async type(
-		sel: string,
-		text: string,
-		delay: number = 0,
-		index: number = 0
-	) {
+	async getElByXPath(sel: string) {
 		await this.#page.waitForXPath(sel);
-		const someInput = await this.#page.$x(sel);
-		await someInput[index]?.type(text, { delay });
-		await setTimeout(1000);
+		const el = await this.#page.$x(sel);
+		return el[0] as ElementHandle<Element>;
 	}
 
 	async getText(sel: string) {
@@ -128,6 +128,19 @@ export class XPup {
 		return selectedElement;
 	}
 
+	async humanClick(element: ElementHandle<Element>) {
+		try {
+			const box = await element.boundingBox();
+			if (box && box.x >= 0 && box.y >= 0) {
+				await this.#cursor.click(element);
+			} else {
+				console.warn("Element out of view, skipping mouse move.");
+			}
+		} catch (error) {
+			console.warn("Could not move mouse:", error);
+		}
+	}
+
 	async humanInfiniteScroll(durationSec: number) {
 		const SCROLL_UP_PROBABILITY = 0.2;
 		const MOVE_MOUSE_PROBABILITY = 0.1;
@@ -183,6 +196,31 @@ export class XPup {
 		}
 	}
 
+	async humanScrollToTop() {
+		let currentScrollY = await this.#page.evaluate(() => window.scrollY);
+
+		while (currentScrollY > 0) {
+			const SCROLL_DISTANCE = randomNumber(500, 900);
+			const EASE_IN_OUT_TIME = randomNumber(100, 400);
+
+			const deltaY = -Math.min(currentScrollY, SCROLL_DISTANCE);
+
+			// Initial easing-in scroll
+			await this.#page.mouse.wheel({ deltaY: deltaY * 0.25 });
+			await setTimeout(EASE_IN_OUT_TIME);
+
+			// Main scroll
+			await this.#page.mouse.wheel({ deltaY: deltaY * 0.5 });
+			await setTimeout(EASE_IN_OUT_TIME);
+
+			// Final easing-out scroll
+			await this.#page.mouse.wheel({ deltaY: deltaY * 0.25 });
+			await setTimeout(EASE_IN_OUT_TIME);
+
+			currentScrollY = await this.#page.evaluate(() => window.scrollY);
+		}
+	}
+
 	async moveMouseOutOfPage() {
 		const viewport = await this.#page.viewport();
 		if (!viewport) {
@@ -213,6 +251,24 @@ export class XPup {
 		);
 	}
 
+	async type(
+		sel: string,
+		text: string,
+		delay: number = 0,
+		index: number = 0
+	) {
+		await this.#page.waitForXPath(sel);
+		const someInput = await this.#page.$x(sel);
+		await someInput[index]?.type(text, { delay });
+		await setTimeout(1000);
+	}
+
+	async typeBySelector(sel: string, text: string, delay?: number) {
+		await this.#page.waitForSelector(sel, { timeout: delay });
+		await this.#page.type(sel, text);
+		await setTimeout(1000);
+	}
+
 	async waitForRemoved(
 		text: string,
 		type: string = "*",
@@ -222,17 +278,5 @@ export class XPup {
 		await this.#page.waitForFunction(
 			`document.evaluate('${sel}', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue === null`
 		);
-	}
-
-	async clickBySelector(sel: string, delay?: number) {
-		await this.#page.waitForSelector(sel, { timeout: delay });
-		await this.#page.click(sel);
-		await setTimeout(1000);
-	}
-
-	async typeBySelector(sel: string, text: string, delay?: number) {
-		await this.#page.waitForSelector(sel, { timeout: delay });
-		await this.#page.type(sel, text);
-		await setTimeout(1000);
 	}
 }
