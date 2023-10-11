@@ -15,3 +15,8 @@ export type Profile = {
 	user_id: string;
 	username: string;
 };
+
+export const ORDER = {
+	DEFAULT: "DEFAULT",
+	RANDOM: "RANDOM",
+} as const;
