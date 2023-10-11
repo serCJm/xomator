@@ -1,7 +1,7 @@
 import { browsePage } from "../src/modules/browsePage.js";
 import { followProfiles } from "../src/modules/followProfiles.js";
 
-const MODULES_MAP = {
+export const MODULES_MAP = {
 	browsePage,
 	followProfiles,
 } as const;
