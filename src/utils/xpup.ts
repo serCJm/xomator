@@ -231,7 +231,6 @@ export class XPup {
 		// To move the mouse out from the top
 		await this.#cursor.move({ x: viewport.width / 2, y: -10 });
 
-		// Optionally, wait for a bit
 		await setTimeout(1000, 3000);
 
 		// To move the mouse out from the bottom
