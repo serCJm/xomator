@@ -8,9 +8,9 @@ import { XPup } from "../utils/xpup.js";
 export async function followProfiles(browser: Browser) {
 	const page = await browser.newPage();
 
-	const { HANDLES, MIN_MAX_PROFILE_WAIT_TIME } =
+	const { HANDLES, MIN_MAX_FOLLOW_WAIT_TIME } =
 		MODULES_CONFIG[followProfiles.name];
-	const [minTime, maxTime] = MIN_MAX_PROFILE_WAIT_TIME!;
+	const [minTime, maxTime] = MIN_MAX_FOLLOW_WAIT_TIME!;
 
 	for (const handle of HANDLES!) {
 		await followProfile(page, handle);
@@ -20,7 +20,7 @@ export async function followProfiles(browser: Browser) {
 
 async function followProfile(page: Page, handle: string) {
 	try {
-		await page.goto(`https://twitter.com/${handle}`);
+		await page.goto(`https://x.com/${handle}`);
 
 		const xPage = new XPup(page);
 
