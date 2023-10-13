@@ -13,7 +13,7 @@ async function main() {
 		toDoRange.has(profile.name)
 	);
 	for (const { user_id } of toDoProfiles) {
-		runProfile(user_id);
+		await runProfile(user_id);
 	}
 }
 
